@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>resultForm</class>
+ <widget class="QWidget" name="resultForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>908</width>
+    <height>508</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Results</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../MBR/Map.ico</normaloff>../MBR/Map.ico</iconset>
+  </property>
+  <widget class="QTableWidget" name="tableWidget">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>901</width>
+     <height>501</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="verticalScrollBarPolicy">
+    <enum>Qt::ScrollBarAlwaysOff</enum>
+   </property>
+   <property name="horizontalScrollBarPolicy">
+    <enum>Qt::ScrollBarAlwaysOff</enum>
+   </property>
+   <property name="autoScroll">
+    <bool>false</bool>
+   </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
+   </property>
+   <property name="dragDropOverwriteMode">
+    <bool>false</bool>
+   </property>
+   <property name="alternatingRowColors">
+    <bool>true</bool>
+   </property>
+   <property name="cornerButtonEnabled">
+    <bool>true</bool>
+   </property>
+   <property name="columnCount">
+    <number>9</number>
+   </property>
+   <attribute name="horizontalHeaderCascadingSectionResizes">
+    <bool>true</bool>
+   </attribute>
+   <attribute name="verticalHeaderVisible">
+    <bool>false</bool>
+   </attribute>
+   <column>
+    <property name="text">
+     <string>Zoom Level</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string># of Tiles</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string># of Cols</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string># of Rows</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Deg Long per Pixel</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Deg Lat per Pixel</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Deg per Pixel</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Ground Resolution</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Map Scale (1:X)</string>
+    </property>
+   </column>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

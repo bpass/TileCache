@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>908</width>
-    <height>508</height>
+    <height>556</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -110,6 +110,19 @@
      <string>Map Scale (1:X)</string>
     </property>
    </column>
+  </widget>
+  <widget class="QPushButton" name="saveButton">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>510</y>
+     <width>181</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save Results</string>
+   </property>
   </widget>
  </widget>
  <resources/>

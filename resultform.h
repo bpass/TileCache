@@ -16,6 +16,8 @@ public:
     void initialize(float[4],int,int,int,float[][9]);
     ~resultForm();
     
+private slots:
+    void save();
 private:
     Ui::resultForm *ui;
 };

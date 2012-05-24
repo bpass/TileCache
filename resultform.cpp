@@ -4,12 +4,15 @@
 #include <QFile>
 #include <QTextStream>
 #include <QFileDialog>
+#include <QMenuBar>
 
 using namespace std;
 
 #define COLS 9
 #define HEIGHT(z) ((z+1)*21+3)
 #define WIDTH 901
+
+bool sci = true;
 
 resultForm::resultForm(QWidget *parent) :
     QWidget(parent),
@@ -21,6 +24,7 @@ resultForm::resultForm(QWidget *parent) :
 
 void resultForm::initialize(float bb[4], int dpi, int pix, int zoom, float arr[][COLS])
 {
+    ui->tableWidget->move(0,0);
     ui->tableWidget->setColumnCount(COLS);
     ui->tableWidget->setRowCount(zoom);
     ui->tableWidget->resizeRowsToContents();
@@ -45,13 +49,20 @@ void resultForm::initialize(float bb[4], int dpi, int pix, int zoom, float arr[]
     this->setFixedSize(WIDTH,HEIGHT(zoom+1)+40);
     ui->saveButton->move(WIDTH/2-ui->saveButton->width()/2,HEIGHT(zoom+1)+5);
 
+    /*
+    QMenuBar* menu = new QMenuBar(this);
+    menu->addMenu("File");
+    menu->addAction("Save");
+    menu->addMenu("Help");
+    menu->addAction("Some help");
+    */
+
     int i,j;
     for(i=0;i<zoom;i++)
     {
         for(j=0;j<COLS;j++)
         {
-            cerr << arr[i][j] << endl;
-            ui->tableWidget->setItem(i,j,new QTableWidgetItem(QString::number(arr[i][j],'f')));
+            ui->tableWidget->setItem(i,j,new QTableWidgetItem(QString::number(arr[i][j],'g')));
         }
     }
 }

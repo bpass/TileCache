@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "utility.h"
+#include "resultform.h"
 
 namespace Ui {
 class MainWindow;
@@ -16,7 +18,7 @@ public:
     ~MainWindow();
 
 private slots:
-    int compute();
+    void compute();
     void test10();
     void testBrazil();
     void testWorld();
@@ -26,7 +28,6 @@ private slots:
     
 private:
     Ui::MainWindow *ui;
-    int compute(float[4],int,int,int,int,float,float);
 };
 
 #endif // MAINWINDOW_H

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>908</width>
-    <height>556</height>
+    <height>608</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -122,6 +122,48 @@
    </property>
    <property name="text">
     <string>Save Results</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="sciBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>530</y>
+     <width>121</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Scientific Notation</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="googleButton">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>530</y>
+     <width>82</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Google Style</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="sampleButton">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>570</y>
+     <width>82</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sample Style</string>
    </property>
   </widget>
  </widget>

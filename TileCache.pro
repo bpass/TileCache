@@ -15,7 +15,8 @@ SOURCES += main.cpp\
     resultform.cpp
 
 HEADERS  += mainwindow.h \
-    resultform.h
+    resultform.h \
+    utility.h
 
 FORMS    += mainwindow.ui \
     resultform.ui

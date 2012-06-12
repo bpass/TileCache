@@ -1,3 +1,9 @@
+////////////////////////////////////////////
+/* Created by Brian Passuello             */
+/* Property of USGS                       */
+/* Last edited 06/12/12                   */
+////////////////////////////////////////////
+
 #include <QtGui/QApplication>
 #include "mainwindow.h"
 

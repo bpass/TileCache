@@ -1,3 +1,9 @@
+////////////////////////////////////////////
+/* Created by Brian Passuello             */
+/* Property of USGS                       */
+/* Last edited 06/12/12                   */
+////////////////////////////////////////////
+
 #ifndef RESULTFORM_H
 #define RESULTFORM_H
 

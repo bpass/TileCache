@@ -1,3 +1,10 @@
+////////////////////////////////////////////
+/* Created by Brian Passuello             */
+/* Property of USGS                       */
+/* Last edited 06/12/12                   */
+////////////////////////////////////////////
+
+
 #include "resultform.h"
 #include "ui_resultform.h"
 #include "mainwindow.h"
@@ -14,11 +21,15 @@ char sci = 'g';
 int dpi = 96;
 int tileWidth = 512;
 int zoomLevels = 20;
+int precision = 4;
 float mapWidth = 0;
 float mapHeight = 0;
 float boundingBox[4];
 float** mapData;
 
+/*
+ * Constructor
+ */
 resultForm::resultForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::resultForm)
@@ -28,18 +39,25 @@ resultForm::resultForm(QWidget *parent) :
     connect(ui->sciBox,SIGNAL(clicked()),this,SLOT(setTable()));
     connect(ui->googleButton,SIGNAL(clicked()),this,SLOT(compute()));
     connect(ui->sampleButton,SIGNAL(clicked()),this,SLOT(compute()));
+    connect(ui->precBox,SIGNAL(valueChanged(int)),this,SLOT(compute()));
 }
 
+/*
+ * Creates the window used for displaying results.
+ */
 void resultForm::initialize(float bb[4], int mdpi, int mpix, int mzoom, float mwidth, float mheight)
 {
+    printf("%f  %f  %f  %f  %f  %f\n",bb[0],bb[1],bb[2],bb[3],mwidth,mheight);
     int i;
 
+    /* Initializes the 2D array being used to hold cell data */
     mapData = new float*[mzoom];
     for(i=0;i<mzoom;i++)
     {
         mapData[i] = new float[COLS];
     }
 
+    /* Sets local variables */
     boundingBox[0]=bb[0]; boundingBox[1]=bb[1]; boundingBox[2]=bb[2]; boundingBox[3]=bb[3];
     dpi = mdpi;
     tileWidth = mpix;
@@ -70,9 +88,11 @@ void resultForm::initialize(float bb[4], int mdpi, int mpix, int mzoom, float mw
                          "  |  DPI = " + QString::number(dpi) +
                          "  |  Tile Width (pixels) = " + QString::number(tileWidth)
                          );
-    this->setFixedSize(WIDTH,HEIGHT(zoomLevels)+40);
+    this->setFixedSize(WIDTH,HEIGHT(zoomLevels)+60);
     ui->saveButton->move(WIDTH/2-ui->saveButton->width()/2,HEIGHT(zoomLevels)+5);
     ui->sciBox->move(WIDTH/2 - 200,HEIGHT(zoomLevels)+5);
+    ui->precLabel->move(WIDTH/2 - 200,HEIGHT(zoomLevels)+25);
+    ui->precBox->move(WIDTH/2 - 150,HEIGHT(zoomLevels)+25);
     ui->googleButton->move(WIDTH/2-400,HEIGHT(zoomLevels)+5);
     ui->sampleButton->move(WIDTH/2-400,HEIGHT(zoomLevels)+25);
     ui->sampleButton->setChecked(true);
@@ -81,7 +101,9 @@ void resultForm::initialize(float bb[4], int mdpi, int mpix, int mzoom, float mw
     compute();
 }
 
-/* Save the current results to a file */
+/*
+ * Save the current results to a file
+ */
 void resultForm::save()
 {
     QFile file(QFileDialog::getSaveFileName());
@@ -104,7 +126,9 @@ void resultForm::save()
     file.close();
 }
 
-/* Sets the data in the table widget */
+/*
+ * Sets the data in the table widget
+ */
 void resultForm::setTable()
 {
     if(ui->sciBox->isChecked()) sci = 'g';
@@ -115,26 +139,35 @@ void resultForm::setTable()
     {
         for(j=0;j<COLS;j++)
         {
-            ui->tableWidget->setItem(i,j,new QTableWidgetItem(QString::number(mapData[i][j],sci,PRECISION)));
+            if(j<4)
+                ui->tableWidget->setItem(i,j,new QTableWidgetItem(QString::number(mapData[i][j],'f',0)));
+            else
+                ui->tableWidget->setItem(i,j,new QTableWidgetItem(QString::number(mapData[i][j],sci,precision)));
+
         }
     }
 }
 
+/*
+ * Computes the table data based on the current variable values
+ */
 void resultForm::compute()
 {
     int i;
 
     float phi = boundingBox[0] - (boundingBox[0]-boundingBox[1])/2;
 
+    precision = ui->precBox->value();
+
     for(i=0;i<zoomLevels;i++)
     {
-        /*Zoom Level*/
+        /* Set the zoom level */
         mapData[i][0]=i;
 
-        /*Num Cols*/
+        /* Calculate the number of columns */
         mapData[i][2]=pow(2,i);
 
-        /*Num Rows*/
+        /* Calculate the number of rows */
         if(ui->sampleButton->isChecked()){
             if(i>0) mapData[i][3]= mapData[i][2]/2;
             else mapData[i][3] = 1;
@@ -142,26 +175,27 @@ void resultForm::compute()
         else
             mapData[i][3] = mapData[i][2];
 
-        /*Num Tiles*/
+        /* Calculate the number of tiles */
         mapData[i][1] = mapData[i][2] * mapData[i][3];
 
-        /*Degrees Long per tile */
+        /* Calculate Degrees longitude per tile */
         mapData[i][4] = mapWidth / mapData[i][2];
 
-        /*Degrees lat per tile */
+        /* Calculate Degrees latitude per tile */
         mapData[i][5] = mapHeight / mapData[i][3];
 
-        /*Degrees per pixel*/
+        /* Calculate Degrees per pixel */
         mapData[i][6] = mapWidth / (pow(2,i) * tileWidth);
 
-        /*Ground resolution at latitude phi*/
+        /* Calculate Ground resolution at latitude phi */
         mapData[i][7] = cos(phi*(M_PI/180))*2*M_PI*
                 (EARTH_CIRCUM/(512*pow(2,i)));
 
-        /* Map Scale */
+        /* Calculate Map Scale */
         mapData[i][8] = (dpi/IN_TO_M)*mapData[i][7];
     }
 
+    /* Makes the new data visible */
     setTable();
 }
 

@@ -1,3 +1,9 @@
+////////////////////////////////////////////
+/* Created by Brian Passuello             */
+/* Property of USGS                       */
+/* Last edited 06/12/12                   */
+////////////////////////////////////////////
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "resultform.h"
@@ -7,6 +13,9 @@
 
 using namespace std;
 
+/*
+ * Constructor
+ */
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -21,10 +30,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->resetButton,SIGNAL(triggered()),this,SLOT(reset()));
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
+/*
+ * Resets the text box values to their default values
+ */
 void MainWindow::reset(){
     ui->highLatBox->clear();
     ui->lowLatBox->clear();
@@ -35,6 +43,10 @@ void MainWindow::reset(){
     ui->zoomBox->setText("20");
 }
 
+/*
+ * Computes minimum bounding rectangle based on given dimensions
+ * and passes parameters to resultform.initialize()
+ */
 void MainWindow::compute()
 {
     int zoom_levels = ui->zoomBox->text().toInt();
@@ -65,18 +77,6 @@ void MainWindow::compute()
         msg.exec();
         return;
     }
-
-    /// DEPRECATED: mins don't need to be less than maxes
-    /* Check if mins are less than maxes */
-    /*
-    if(minLong >= maxLong || minLat >= maxLat)
-    {
-        QMessageBox msg;
-        msg.setText("Error: Make sure minimum longitude and latitude are strictly less than their respective maximums");
-        msg.exec();
-        return;
-    }
-    */
 
     /* Check if the person is showing more than the whole world */
     if(fabsf(maxLong-minLong)>360 || fabsf(maxLat-minLat) > 180)
@@ -116,6 +116,7 @@ void MainWindow::compute()
 
     float deltaLat = 2 * (maxLat - minLat);
     float deltaLong;
+
     /* Cases for if longitudes cross international date line */
     if(maxLong>minLong) deltaLong = maxLong - minLong;
     else deltaLong = 360-(minLong-maxLong);
@@ -145,6 +146,14 @@ void MainWindow::compute()
     resultForm* results = new resultForm();
     results->initialize(bb,dpi,pix_width,zoom_levels,deltaLong,deltaLat);
     results->show();
+}
+
+/*
+ * Default destructor
+ */
+MainWindow::~MainWindow()
+{
+    delete ui;
 }
 
 

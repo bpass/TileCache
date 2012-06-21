@@ -1,7 +1,7 @@
 ////////////////////////////////////////////
 /* Created by Brian Passuello             */
 /* Property of USGS                       */
-/* Last edited 06/12/12                   */
+/* Last edited 06/21/12                   */
 ////////////////////////////////////////////
 
 #include "mainwindow.h"
@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->test10,SIGNAL(triggered()),this,SLOT(test10()));
     connect(ui->testBrazil,SIGNAL(triggered()),this,SLOT(testBrazil()));
     connect(ui->testWorld,SIGNAL(triggered()),this,SLOT(testWorld()));
-    connect(ui->testConus,SIGNAL(triggered()),this,SLOT(testConus()));
+    connect(ui->testUSA,SIGNAL(triggered()),this,SLOT(testUSA()));
     connect(ui->testAK,SIGNAL(triggered()),this,SLOT(testAK()));
     connect(ui->resetButton,SIGNAL(triggered()),this,SLOT(reset()));
 }
@@ -143,6 +143,13 @@ void MainWindow::compute()
 
     zoom_levels++;
     float bb[4] = {maxLat,minLat,maxLong,minLong};
+
+    deltaLat = maxLat - minLat;
+
+    /* Cases for if longitudes cross international date line */
+    if(maxLong>minLong) deltaLong = maxLong - minLong;
+    else deltaLong = 360-(minLong-maxLong);
+
     resultForm* results = new resultForm();
     results->initialize(bb,dpi,pix_width,zoom_levels,deltaLong,deltaLat);
     results->show();
@@ -160,8 +167,6 @@ MainWindow::~MainWindow()
 /**************** TEST CASES ******************/
 
 
-
-/* Run a test with zoomlevel=10, lat = 45, long = 80 */
 void MainWindow::test10(){
     ui->lowLatBox->setText("-20");
     ui->highLatBox->setText("25");
@@ -189,11 +194,11 @@ void MainWindow::testWorld(){
     compute();
 }
 
-void MainWindow::testConus(){
+void MainWindow::testUSA(){
     ui->lowLatBox->setText("17");
     ui->highLatBox->setText("73");
-    ui->lowLongBox->setText("-60");
-    ui->highLongBox->setText("170");
+    ui->lowLongBox->setText("170");
+    ui->highLongBox->setText("-60");
     ui->zoomBox->setText("20");
     compute();
 }
@@ -201,8 +206,8 @@ void MainWindow::testConus(){
 void MainWindow::testAK(){
     ui->lowLatBox->setText("50");
     ui->highLatBox->setText("72");
-    ui->lowLongBox->setText("-128");
-    ui->highLongBox->setText("170");
+    ui->lowLongBox->setText("170");
+    ui->highLongBox->setText("-128");
     ui->zoomBox->setText("20");
     compute();
 }

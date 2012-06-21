@@ -1,7 +1,7 @@
 ////////////////////////////////////////////
 /* Created by Brian Passuello             */
 /* Property of USGS                       */
-/* Last edited 06/12/12                   */
+/* Last edited 06/21/12                   */
 ////////////////////////////////////////////
 
 
@@ -40,6 +40,8 @@ resultForm::resultForm(QWidget *parent) :
     connect(ui->googleButton,SIGNAL(clicked()),this,SLOT(compute()));
     connect(ui->sampleButton,SIGNAL(clicked()),this,SLOT(compute()));
     connect(ui->precBox,SIGNAL(valueChanged(int)),this,SLOT(compute()));
+    connect(ui->scaleButton,SIGNAL(clicked()),this,SLOT(addRow()));
+    connect(ui->scaleSaveButton,SIGNAL(clicked()),this,SLOT(saveScale()));
 }
 
 /*
@@ -47,7 +49,6 @@ resultForm::resultForm(QWidget *parent) :
  */
 void resultForm::initialize(float bb[4], int mdpi, int mpix, int mzoom, float mwidth, float mheight)
 {
-    printf("%f  %f  %f  %f  %f  %f\n",bb[0],bb[1],bb[2],bb[3],mwidth,mheight);
     int i;
 
     /* Initializes the 2D array being used to hold cell data */
@@ -65,12 +66,12 @@ void resultForm::initialize(float bb[4], int mdpi, int mpix, int mzoom, float mw
     mapWidth = mwidth;
     mapHeight = mheight;
 
-    /* Set up the form */
-    ui->tableWidget->move(0,0);
+    /* Set up the main table */
+    ui->tableWidget->move(10,0);
     ui->tableWidget->setColumnCount(COLS);
     ui->tableWidget->setRowCount(zoomLevels);
     ui->tableWidget->resizeRowsToContents();
-    ui->tableWidget->resize(WIDTH,HEIGHT(zoomLevels));
+    ui->tableWidget->resize(901,HEIGHT(zoomLevels)+5);
     ui->tableWidget->horizontalHeader()->setResizeMode (QHeaderView::Fixed);
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Zoom\nLevel" <<
                                                "Number of \n Tiles" <<
@@ -81,24 +82,48 @@ void resultForm::initialize(float bb[4], int mdpi, int mpix, int mzoom, float mw
                                                "Degrees \n per Pixel" <<
                                                "Ground Resolution \n (meters/pixel)" <<
                                                "Map Scale \n 1:X \n at " + QString::number(dpi) + " DPI");
-    this->setWindowTitle("Results: High Lat = " + QString::number(bb[0]) +
-                         "  |  Low Lat = " + QString::number(bb[1]) +
-                         "  |  High Long = " + QString::number(bb[2]) +
+
+    /* Set up the map scale table */
+    ui->scaleTable->move(ui->tableWidget->x()+ui->tableWidget->width()+10,0);
+    ui->scaleTable->setRowCount(0);
+    ui->scaleTable->resizeRowsToContents();
+    ui->scaleTable->resize(2*ui->scaleTable->columnWidth(1),ui->tableWidget->height());
+    ui->scaleTable->horizontalHeader()->setResizeMode(QHeaderView::Fixed);
+
+    /* Set up various buttons */
+    ui->saveButton->move(
+                ui->tableWidget->x()+ui->tableWidget->width()/2-ui->saveButton->width(),
+                HEIGHT(zoomLevels)+20);
+    ui->scaleSaveButton->move(
+                ui->tableWidget->x()+ui->tableWidget->width()/2,HEIGHT(zoomLevels)+20);
+
+    ui->googleButton->move(ui->tableWidget->x()+10,HEIGHT(zoomLevels)+5);
+    ui->sampleButton->move(ui->tableWidget->x()+10,HEIGHT(zoomLevels)+25);
+
+    ui->sciBox->move(ui->tableWidget->x()+110,HEIGHT(zoomLevels)+15);
+    ui->precLabel->move(ui->tableWidget->x()+230,HEIGHT(zoomLevels)+15);
+    ui->precBox->move(ui->precLabel->x()+ui->precBox->width()+5,HEIGHT(zoomLevels)+15);
+
+    ui->scaleButton->move(ui->scaleTable->x()+ui->scaleTable->width()/2-ui->scaleButton->width()/2,HEIGHT(zoomLevels)+25);
+    ui->scaleText->move(ui->scaleTable->x()+ui->scaleTable->width()/2-ui->scaleText->width()/2,HEIGHT(zoomLevels)+5);
+
+    /* Set up the form */
+    this->setWindowTitle("Results: Low Lat = " + QString::number(bb[1]) +
+                         "  |  High Lat = " + QString::number(bb[0]) +
                          "  |  Low Long = " + QString::number(bb[3]) +
+                         "  |  High Long = " + QString::number(bb[2]) +
                          "  |  DPI = " + QString::number(dpi) +
                          "  |  Tile Width (pixels) = " + QString::number(tileWidth)
                          );
-    this->setFixedSize(WIDTH,HEIGHT(zoomLevels)+60);
-    ui->saveButton->move(WIDTH/2-ui->saveButton->width()/2,HEIGHT(zoomLevels)+5);
-    ui->sciBox->move(WIDTH/2 - 200,HEIGHT(zoomLevels)+5);
-    ui->precLabel->move(WIDTH/2 - 200,HEIGHT(zoomLevels)+25);
-    ui->precBox->move(WIDTH/2 - 150,HEIGHT(zoomLevels)+25);
-    ui->googleButton->move(WIDTH/2-400,HEIGHT(zoomLevels)+5);
-    ui->sampleButton->move(WIDTH/2-400,HEIGHT(zoomLevels)+25);
-    ui->sampleButton->setChecked(true);
+    this->setFixedSize(ui->tableWidget->width()+ui->scaleTable->width()+30,HEIGHT(zoomLevels)+50);
 
-    /* Calculate the data */
     compute();
+
+    /* Adds some default scales */
+    addLatRow(24000); addLatRow(25000); addLatRow(48000);
+    addLatRow(63000); addLatRow(100000); addLatRow(125000);
+    addLatRow(250000); addLatRow(500000); addLatRow(1000000);
+    addLatRow(2000000);
 }
 
 /*
@@ -127,6 +152,28 @@ void resultForm::save()
 }
 
 /*
+ * Saves the data from the map scale table
+ */
+void resultForm::saveScale(){
+    QFile file(QFileDialog::getSaveFileName());
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+    out << "Map Scale (1:X);Central Latitude \n";
+
+    int i,j;
+    for(i=0;i<ui->scaleTable->rowCount();i++)
+    {
+        for(j=0;j<2;j++)
+        {
+            out << ui->scaleTable->item(i,j)->text();
+            if(j==0) out << ";";
+        }
+        out << "\n";
+    }
+    file.close();
+}
+
+/*
  * Sets the data in the table widget
  */
 void resultForm::setTable()
@@ -143,7 +190,6 @@ void resultForm::setTable()
                 ui->tableWidget->setItem(i,j,new QTableWidgetItem(QString::number(mapData[i][j],'f',0)));
             else
                 ui->tableWidget->setItem(i,j,new QTableWidgetItem(QString::number(mapData[i][j],sci,precision)));
-
         }
     }
 }
@@ -195,8 +241,47 @@ void resultForm::compute()
         mapData[i][8] = (dpi/IN_TO_M)*mapData[i][7];
     }
 
-    /* Makes the new data visible */
     setTable();
+}
+
+/*
+ * Takes in a desired map scale and calculates the central
+ * latitude necessary to achieve the scale. Adds the result
+ * to the scale table.
+ */
+void resultForm::addLatRow(int scale)
+{
+    int i,index=0;
+    float lat=0,diff=fabs(mapData[index][8]- scale);
+    for(i=0;i<zoomLevels;i++)
+    {
+        if(fabs(mapData[i][8]-scale)<diff)
+        {
+            diff=fabs(mapData[i][8]-scale);
+            index = i;
+        }
+    }
+    float res = scale*IN_TO_M/dpi;
+    lat = (512*pow(2,index)*res)/(2*M_PI*EARTH_CIRCUM);
+
+    if(lat > 1)
+    {
+        lat=90-((-lat+M_PI)*(180/M_PI));
+    }
+    else
+    {
+        lat = acos(lat)*(180/M_PI);
+    }
+
+    int row = ui->scaleTable->rowCount();
+    ui->scaleTable->insertRow(row);
+    ui->scaleTable->setItem(row,0,new QTableWidgetItem(QString::number(scale)));
+    ui->scaleTable->setItem(row,1,new QTableWidgetItem(QString::number(lat)));
+}
+
+void resultForm::addRow(){
+    int scale = ui->scaleText->text().toInt();
+    if(scale>0) addLatRow(scale);
 }
 
 /* Default destructor */

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////
 /* Created by Brian Passuello             */
 /* Property of USGS                       */
-/* Last edited 06/12/12                   */
+/* Last edited 06/21/12                   */
 ////////////////////////////////////////////
 
 #ifndef MAINWINDOW_H
@@ -28,7 +28,7 @@ private slots:
     void test10();
     void testBrazil();
     void testWorld();
-    void testConus();
+    void testUSA();
     void testAK();
     void reset();
     

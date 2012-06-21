@@ -1,7 +1,7 @@
 ////////////////////////////////////////////
 /* Created by Brian Passuello             */
 /* Property of USGS                       */
-/* Last edited 06/12/12                   */
+/* Last edited 06/21/12                   */
 ////////////////////////////////////////////
 
 #ifndef RESULTFORM_H
@@ -22,12 +22,15 @@ class resultForm : public QWidget
 public:
     explicit resultForm(QWidget *parent = 0);
     void initialize(float[4],int,int,int,float,float);
+    void addLatRow(int scale);
     ~resultForm();
     
 private slots:
     void save();
+    void saveScale();
     void setTable();
     void compute();
+    void addRow();
 private:
     Ui::resultForm *ui;
 };
